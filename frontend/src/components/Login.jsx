@@ -23,7 +23,7 @@ const Login = () => {
   return (
     <div className=' h-screen bg-blue-200 flex justify-center items-center flex-col'>
       <form
-        className=' p-9 rounded flex flex-col gap-5 p-3 border-2 border-solid border-slate-400'
+        className=' p-9 rounded flex flex-col gap-5  border-2 border-solid border-slate-400'
         onSubmit={handleSubmit(onSubmit)}>
         <h2 className=' text-center font-semibold text-3xl text-blue-700'>
           Login
