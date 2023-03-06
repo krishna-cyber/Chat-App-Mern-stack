@@ -1,11 +1,16 @@
 require("dotenv").config();
-//importing modules and libraries
 
+//importing modules and libraries
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
+const router = require("./routes/simpleRoute");
 
 //making an server instance
 const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(router);
 
 //connection to database and server start
 mongoose

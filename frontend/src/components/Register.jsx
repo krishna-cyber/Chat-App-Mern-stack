@@ -10,9 +10,9 @@ const Register = () => {
 
   const onSubmit = (data) => console.log(data);
   return (
-    <div className=' h-screen bg-blue-200 flex justify-center items-center'>
+    <div className=' h-screen bg-blue-200 flex justify-center items-center flex-col'>
       <form
-        className=' flex flex-col gap-5 p-3 '
+        className=' p-9 rounded flex flex-col gap-5 p-3 border-2 border-solid border-slate-400'
         onSubmit={handleSubmit(onSubmit)}>
         <h2 className=' text-center font-semibold text-3xl text-blue-700'>
           Register
@@ -48,6 +48,10 @@ const Register = () => {
           Register
         </button>
       </form>
+      <p className='text-lg mt-3'>
+        Already a user?{" "}
+        <span className=' text-green-600 underline cursor-pointer'>Login</span>
+      </p>
     </div>
   );
 };
