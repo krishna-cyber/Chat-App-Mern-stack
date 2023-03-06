@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form";
 import server from "../../utils/server";
-
 import { Link } from "react-router-dom";
 
-const Register = () => {
+const Login = () => {
   const {
     register,
     handleSubmit,
@@ -13,7 +12,7 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     await server
-      .post("/register", data)
+      .post("/login", data)
       .then((res) => {
         console.log(res.data);
       })
@@ -27,25 +26,14 @@ const Register = () => {
         className=' p-9 rounded flex flex-col gap-5 p-3 border-2 border-solid border-slate-400'
         onSubmit={handleSubmit(onSubmit)}>
         <h2 className=' text-center font-semibold text-3xl text-blue-700'>
-          Register
+          Login
         </h2>
-        <div className='form-control'>
-          <input
-            className='input'
-            {...register("username", { required: true })}
-            placeholder='Username'
-          />
-          {errors.username && (
-            <span className=' block text-purple-800'>
-              This field is required
-            </span>
-          )}
-        </div>
+
         <div className='form-control'>
           <input
             className='input'
             {...register("email", { required: true })}
-            placeholder='emial'
+            placeholder='email'
           />
           {errors.username && (
             <span className=' block text-purple-800'>
@@ -69,17 +57,17 @@ const Register = () => {
         <button
           className='input bg-blue-600 text-white hover:bg-blue-700 '
           type='submit'>
-          Register
+          Login
         </button>
       </form>
       <p className='text-lg mt-3'>
-        Already a user?{" "}
-        <Link to='/login' className=' text-green-600 underline cursor-pointer'>
-          Login
-        </Link>
+        Not registered yet?{" "}
+        <span className=' text-green-600 underline cursor-pointer'>
+          <Link to='/'>Register</Link>
+        </span>
       </p>
     </div>
   );
 };
 
-export default Register;
+export default Login;
