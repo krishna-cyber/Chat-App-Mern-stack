@@ -5,11 +5,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const router = require("./routes/simpleRoute");
+const helmet = require("helmet");
 
 //making an server instance
 const app = express();
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(router);
 
 //connection to database and server start
