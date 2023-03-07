@@ -1,5 +1,7 @@
 import { useForm } from "react-hook-form";
+import { useContext } from "react";
 import server from "../../utils/server";
+import { userContext } from "../userContext";
 
 import { Link } from "react-router-dom";
 
@@ -11,12 +13,16 @@ const Register = () => {
     formState: { errors },
   } = useForm();
 
+  const { user, setUser, id, setId } = useContext(userContext);
+
   const onSubmit = async (data) => {
     await server
       .post("/register", data)
       .then((res) => {
-        console.log(res.data);
+        setUser("res.data.username");
+        setId("res.data.id");
       })
+
       .catch((err) => {
         console.log(err);
       });
@@ -44,18 +50,29 @@ const Register = () => {
         <div className='form-control'>
           <input
             className='input'
-            {...register("email", { required: true })}
-            placeholder='emial'
+            type='email'
+            {...register("email", {
+              required: {
+                value: true,
+                message: "Email is required",
+              },
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid email address",
+              },
+            })}
+            placeholder='email'
           />
-          {errors.username && (
+          {errors.email && (
             <span className=' block text-purple-800'>
-              This field is required
+              {errors.email.message}
             </span>
           )}
         </div>
         <div className='form-control'>
           <input
             className='input'
+            type='password'
             {...register("password", { required: true })}
             placeholder='Password'
           />
