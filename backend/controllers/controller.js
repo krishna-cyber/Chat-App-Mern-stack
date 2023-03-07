@@ -7,8 +7,10 @@ const home = (req, res) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { username, email } = await User.create(req.body);
-    const token = jwt.sign({ username, email }, "process.env.SECRET", {
+    const { _id, username } = await User.create(req.body).catch((err) => {
+      throw err;
+    });
+    const token = jwt.sign({ username, _id }, "process.env.SECRET", {
       expiresIn: "1h",
     });
     //responding to client
@@ -20,10 +22,16 @@ const registerUser = async (req, res) => {
         path: "/",
       })
       .status(201)
-      .send("User Register route");
+      .json({
+        id: _id,
+        username,
+      });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ error: error.message });
   }
 };
 
-module.exports = { home, registerUser };
+//login user
+const loginUser = async (req, res) => {};
+
+module.exports = { home, registerUser, loginUser };
