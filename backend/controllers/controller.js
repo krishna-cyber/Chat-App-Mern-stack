@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const passport = require("passport");
+const localStrategy = require("passport-local").Strategy;
 
 //define a function that generates a jwt token
 function generateAccessToken(username, id) {
@@ -20,19 +22,19 @@ const registerUser = async (req, res) => {
       throw err;
     });
     const token = generateAccessToken(username, _id);
-    //responding to client
-    res
-      .cookie("token", token, {
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-        path: "/",
-      })
-      .status(201)
-      .json({
-        id: _id,
-        username,
-      });
+    //responding to client with a cookie with expiration time of 30 minutes
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      path: "/",
+      expires: new Date(Date.now() + 900000),
+    });
+    //sending the user id and username to the client
+    res.status(201).json({
+      id: _id,
+      username,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -40,43 +42,57 @@ const registerUser = async (req, res) => {
 
 //login user
 const loginUser = async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    await User.findOne({ username })
-      .then(async (user) => {
-        const { _id, username, password: userpassword } = user;
-        await bcrypt
-          .compare(password, userpassword)
-          .then((result) => {
-            if (!result) {
-              res.status(400).json({ error: "Invalid username or password" });
+  let { username, password } = req.body;
+  User.findOne({ username })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      } else {
+        bcrypt
+          .compare(password, user.password)
+          .then((isMatch) => {
+            if (!isMatch) {
+              return res.status(400).json({ error: "Invalid credentials" });
             }
-            const token = generateAccessToken(username, _id);
-
-            //responding to client
-            res.cookie("token", token, {
-              httpOnly: true,
-              sameSite: "none",
-              secure: true,
-              path: "/",
-            });
-            //sending the user id and username to the client
-            res.status(200).json({
-              id: _id,
-              username,
+            const token = generateAccessToken(user.username, user._id);
+            jwt.verify(token, process.env.SECRET, (err, user) => {
+              if (err) {
+                return res.status(403).json({ error: "Forbidden" });
+              }
+              if (user) {
+                res.cookie("token", token, {
+                  httpOnly: true,
+                  sameSite: "none",
+                  secure: true,
+                  path: "/",
+                  expires: new Date(Date.now() + 900000),
+                });
+                return res.status(200).json(user);
+              }
             });
           })
           .catch((err) => {
-            res.status(400).json({ error: err.message });
+            return res.status(500).json({ error: err.message });
           });
-      })
-      .catch((err) => {
-        res.status(400).json({ error: err.message });
-      });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ error: error.message });
-  }
+      }
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
 };
 
-module.exports = { home, registerUser, loginUser };
+//profile
+const profile = async (req, res) => {
+  const { token } = req.cookies;
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  jwt.verify(token, process.env.SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    return res.status(200).json(user.username, user._id);
+  });
+};
+
+module.exports = { home, registerUser, loginUser, profile };
