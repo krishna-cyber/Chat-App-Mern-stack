@@ -89,9 +89,9 @@ const profile = async (req, res) => {
   }
   jwt.verify(token, process.env.SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(400).json({ error: "Forbidden" });
     }
-    return res.status(200).json(user.username, user._id);
+    return res.status(200).json({ username: user.username, id: user.id });
   });
 };
 
