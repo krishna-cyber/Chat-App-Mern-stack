@@ -4,6 +4,7 @@ import server from "../../utils/server";
 import { userContext } from "../userContext";
 
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
   const {
@@ -15,14 +16,14 @@ const Register = () => {
 
   const { user, setUser, id, setId } = useContext(userContext);
 
-  const onSubmit = async (data) => {
-    await server
-      .post("/register", data)
+  const onSubmit = (data) => {
+    server
+      .post("http://localhost:3000/register", data)
       .then((res) => {
-        setUser("res.data.username");
-        setId("res.data.id");
+        console.log(res.data);
+        setUser(res.data.username);
+        setId(res.data.id);
       })
-
       .catch((err) => {
         console.log(err);
       });

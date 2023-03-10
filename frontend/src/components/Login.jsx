@@ -1,8 +1,11 @@
 import { useForm } from "react-hook-form";
 import server from "../../utils/server";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { userContext } from "../userContext";
 
 const Login = () => {
+  const { user, setUser, id, setId } = useContext(userContext);
   const {
     register,
     handleSubmit,
@@ -11,10 +14,12 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
+    console.log(data);
     await server
       .post("/login", data)
       .then((res) => {
-        console.log(res.data);
+        setUser(res.data.username);
+        setId(res.data.id);
       })
       .catch((err) => {
         console.log(err);
@@ -32,8 +37,8 @@ const Login = () => {
         <div className='form-control'>
           <input
             className='input'
-            {...register("email", { required: true })}
-            placeholder='email'
+            {...register("username", { required: true })}
+            placeholder='username'
           />
           {errors.username && (
             <span className=' block text-purple-800'>
