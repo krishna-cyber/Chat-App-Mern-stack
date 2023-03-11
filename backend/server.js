@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const router = require("./routes/simpleRoute");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const ws = require("./services/ws");
 
 //making an server instance
 const app = express();
@@ -32,11 +33,14 @@ mongoose
   })
   .then((conn) => {
     console.log(`connected to database ${conn.connection.host}`);
-    app.listen(process.env.PORT, () => {
+    const server = app.listen(process.env.PORT, () => {
       console.log(`server started on port ${process.env.PORT}`);
     });
-  })
 
+    ws(server); /*  this is the line that starts the websocket server 
+                  and passes the express server instance to it
+                  imported from backend\services\ws.js*/
+  })
   .catch((err) => {
     console.log(err);
   });

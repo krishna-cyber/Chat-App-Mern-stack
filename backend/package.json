@@ -10,7 +10,8 @@
     "mongoose": "^7.0.0",
     "morgan": "^1.10.0",
     "passport": "^0.6.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "ws": "^8.13.0"
   },
   "scripts": {
     "dev": "nodemon server.js"
