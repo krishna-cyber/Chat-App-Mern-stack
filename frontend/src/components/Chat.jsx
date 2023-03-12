@@ -1,6 +1,32 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+
 const Chat = () => {
+  const [ws, setws] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState({});
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:3000");
+    socket.onopen = () => {
+      setws(socket);
+    };
+    socket.addEventListener("message", handlemessage);
+  }, []);
+
+  const handlemessage = (e) => {
+    //parse json to object
+    const data = JSON.parse(e.data);
+    //if online property is present
+    if (data.online) {
+      showOnlineUsers(data.online);
+    }
+  };
+
+  const showOnlineUsers = (onlineUsers) => {
+    console.log(onlineUsers);
+  };
+
   const {
     register,
     handleSubmit,
@@ -25,6 +51,9 @@ const Chat = () => {
           </svg>
 
           <span>ChatApp</span>
+        </div>
+        <div className='contacts'>
+          contacts to be shown here online contacts
         </div>
       </div>
       <div className=' w-2/3 bg-blue-50 flex p-4 flex-col'>
