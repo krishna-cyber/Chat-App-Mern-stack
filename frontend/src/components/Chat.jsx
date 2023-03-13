@@ -1,10 +1,12 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
+import Avatar from "./Avatar";
 
 const Chat = () => {
   const [ws, setws] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState({});
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:3000");
@@ -25,6 +27,12 @@ const Chat = () => {
 
   const showOnlineUsers = (onlineUsers) => {
     console.log(onlineUsers);
+    let obj = Object.assign(
+      {},
+      ...onlineUsers.map((person) => ({ [person.id]: person.username }))
+    );
+    console.log(obj);
+    setOnlineUsers(obj);
   };
 
   const {
@@ -39,8 +47,8 @@ const Chat = () => {
 
   return (
     <section className=' h-screen flex'>
-      <div className=' w-1/3 bg-blue-200 p-4'>
-        <div className='flex gap-2 font-bold text-3xl text-blue-600 items-center'>
+      <div className=' w-1/3 bg-blue-100 '>
+        <div className='flex gap-2 font-bold text-3xl text-blue-600 items-center p-4'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
             viewBox='0 0 24 24'
@@ -52,8 +60,21 @@ const Chat = () => {
 
           <span>ChatApp</span>
         </div>
-        <div className='contacts'>
-          contacts to be shown here online contacts
+        <div className=' flex flex-col gap-2'>
+          {Object.keys(onlineUsers).map((key) => (
+            <div
+              key={key}
+              onClick={() => setSelectedUser(key)}
+              className={
+                "flex gap-3 px-2 py-4 cursor-pointer font-semibold text-2xl capitalize  " +
+                (selectedUser === key
+                  ? "bg-blue-50 border-blue-400 border-l-[6px]"
+                  : "")
+              }>
+              <Avatar />
+              {onlineUsers[key]}
+            </div>
+          ))}
         </div>
       </div>
       <div className=' w-2/3 bg-blue-50 flex p-4 flex-col'>
