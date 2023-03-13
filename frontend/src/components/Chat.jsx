@@ -1,20 +1,24 @@
-import React from "react";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Avatar from "./Avatar";
+import { userContext } from "../userContext";
 
 const Chat = () => {
   const [ws, setws] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
+  const { id } = useContext(userContext);
+  const [refresh, setrefresh] = useState(false);
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:3000");
     socket.onopen = () => {
       setws(socket);
     };
+    //execute only when refresh state changes
+
     socket.addEventListener("message", handlemessage);
-  }, []);
+  }, [refresh]);
 
   const handlemessage = (e) => {
     //parse json to object
@@ -26,12 +30,13 @@ const Chat = () => {
   };
 
   const showOnlineUsers = (onlineUsers) => {
-    console.log(onlineUsers);
     let obj = Object.assign(
       {},
       ...onlineUsers.map((person) => ({ [person.id]: person.username }))
     );
-    console.log(obj);
+    //remove current user from online users
+    delete obj[id];
+
     setOnlineUsers(obj);
   };
 
@@ -59,6 +64,20 @@ const Chat = () => {
           </svg>
 
           <span>ChatApp</span>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke-width='1.5'
+            stroke='currentColor'
+            class='w-6 h-6 ml-auto cursor-pointer active:rotate-90'
+            onClick={() => setrefresh(true)}>
+            <path
+              stroke-linecap='round'
+              stroke-linejoin='round'
+              d='M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99'
+            />
+          </svg>
         </div>
         <div className=' flex flex-col gap-2'>
           {Object.keys(onlineUsers).map((key) => (
@@ -66,7 +85,7 @@ const Chat = () => {
               key={key}
               onClick={() => setSelectedUser(key)}
               className={
-                "flex gap-3 px-2 py-4 cursor-pointer font-semibold text-2xl capitalize  " +
+                "flex gap-3 items-center px-10 py-4 cursor-pointer font-semibold text-2xl capitalize  " +
                 (selectedUser === key
                   ? "bg-blue-50 border-blue-400 border-l-[6px]"
                   : "")
@@ -78,35 +97,44 @@ const Chat = () => {
         </div>
       </div>
       <div className=' w-2/3 bg-blue-50 flex p-4 flex-col'>
-        <div className=' flex-grow'></div>
-
-        <form
-          className=' flex gap-2 items-center'
-          onSubmit={handleSubmit(onsubmit)}>
-          <input
-            {...register("message", { required: true })}
-            type='text'
-            className=' p-2 border-2 rounded flex-grow'
-            placeholder='Enter your message here...'
-          />
-          <button
-            type='submit'
-            className=' bg-blue-500 p-2 rounded text-white hover:bg-blue-600'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke-width='1.5'
-              stroke='currentColor'
-              class='w-6 h-6'>
-              <path
-                stroke-linecap='round'
-                stroke-linejoin='round'
-                d='M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5'
-              />
-            </svg>
-          </button>
-        </form>
+        <div className=' flex-grow'>
+          {!selectedUser && (
+            <div className=' flex items-center justify-center h-full'>
+              <span className=' text-2xl font-semibold text-slate-400'>
+                ⬅️ Please select your loved one to start chatting
+              </span>
+            </div>
+          )}
+        </div>
+        {selectedUser && (
+          <form
+            className=' flex gap-2 items-center'
+            onSubmit={handleSubmit(onsubmit)}>
+            <input
+              {...register("message", { required: true })}
+              type='text'
+              className=' p-2 border-2 rounded flex-grow'
+              placeholder='Enter your message here...'
+            />
+            <button
+              type='submit'
+              className=' bg-blue-500 p-2 rounded text-white hover:bg-blue-600'>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke-width='1.5'
+                stroke='currentColor'
+                class='w-6 h-6'>
+                <path
+                  stroke-linecap='round'
+                  stroke-linejoin='round'
+                  d='M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5'
+                />
+              </svg>
+            </button>
+          </form>
+        )}
       </div>
     </section>
   );
