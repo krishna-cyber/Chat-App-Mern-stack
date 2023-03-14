@@ -7,8 +7,10 @@ const Chat = () => {
   const [ws, setws] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
-  const { id } = useContext(userContext);
   const [refresh, setrefresh] = useState(false);
+  const [messages, setMessages] = useState([]);
+
+  const { id } = useContext(userContext);
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:3000");
@@ -44,10 +46,21 @@ const Chat = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm();
 
   const onsubmit = (data) => {
-    console.log(data);
+    //send message to server
+    ws.send(
+      JSON.stringify({
+        message: data.message,
+        to: selectedUser,
+        from: id,
+      })
+    );
+    //clear input field
+    setValue("message", "");
+    setMessages((prev) => [...prev, { message: data.message, isOur: true }]);
   };
 
   return (
@@ -105,6 +118,8 @@ const Chat = () => {
               </span>
             </div>
           )}
+          {!!selectedUser &&
+            messages.map((message, index) => <div>{message.message}</div>)}
         </div>
         {selectedUser && (
           <form
