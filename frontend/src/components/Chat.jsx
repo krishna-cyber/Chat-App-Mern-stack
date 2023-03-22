@@ -1,7 +1,9 @@
 import { useForm } from "react-hook-form";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import Avatar from "./Avatar";
 import { userContext } from "../userContext";
+import server from "../../utils/server";
+import { uniqBy } from "lodash";
 
 const Chat = () => {
   const [ws, setws] = useState(null);
@@ -9,6 +11,7 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [refresh, setrefresh] = useState(false);
   const [messages, setMessages] = useState([]);
+  const divundermessages = useRef();
 
   const { id } = useContext(userContext);
 
@@ -22,12 +25,35 @@ const Chat = () => {
     socket.addEventListener("message", handlemessage);
   }, [refresh]);
 
+  useEffect(() => {
+    if (selectedUser) {
+      server
+        .get(`/messages`, {
+          sender: id,
+          receiver: selectedUser,
+        })
+        .then((res) => {
+          console.log(res.data);
+        });
+    }
+  }, [selectedUser]);
+
   const handlemessage = (e) => {
     //parse json to object
     const data = JSON.parse(e.data);
+
     //if online property is present
     if (data.online) {
       showOnlineUsers(data.online);
+    }
+    //if message property is present
+    if (data.message) {
+      //if message is for current user
+      if (data.message.receiver === id) {
+        data.message.id = Date.now();
+        //add message to messages array
+        setMessages((prev) => uniqBy([...prev, data.message], "id"));
+      }
     }
   };
 
@@ -38,7 +64,6 @@ const Chat = () => {
     );
     //remove current user from online users
     delete obj[id];
-
     setOnlineUsers(obj);
   };
 
@@ -59,9 +84,23 @@ const Chat = () => {
       })
     );
     //clear input field
+    setMessages((prev) => [
+      ...prev,
+      {
+        message: data.message,
+        receiver: selectedUser,
+        sender: id,
+        id: Date.now(),
+      },
+    ]);
     setValue("message", "");
-    setMessages((prev) => [...prev, { message: data.message, isOur: true }]);
   };
+  useEffect(() => {
+    const div = divundermessages.current;
+    if (div) {
+      div.scrollIntoView({ behaviour: "smooth", block: "end" });
+    }
+  }, [messages]);
 
   return (
     <section className=' h-screen flex'>
@@ -110,7 +149,7 @@ const Chat = () => {
         </div>
       </div>
       <div className=' w-2/3 bg-blue-50 flex p-4 flex-col'>
-        <div className=' flex-grow'>
+        <div className=' flex-grow flex flex-col overflow-y-scroll scrollbar'>
           {!selectedUser && (
             <div className=' flex items-center justify-center h-full'>
               <span className=' text-2xl font-semibold text-slate-400'>
@@ -119,7 +158,18 @@ const Chat = () => {
             </div>
           )}
           {!!selectedUser &&
-            messages.map((message, index) => <div>{message.message}</div>)}
+            messages.map((message, index) => (
+              <div
+                className={
+                  "p-4 mb-3 rounded-md max-w-[50%]" +
+                  (message.sender == id
+                    ? " bg-blue-500 self-end text-white"
+                    : " bg-blue-200 text-blue-700 self-start")
+                }>
+                {message.message}
+              </div>
+            ))}
+          <div ref={divundermessages}></div>
         </div>
         {selectedUser && (
           <form

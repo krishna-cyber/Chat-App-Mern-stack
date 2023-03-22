@@ -14,7 +14,6 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data);
     await server
       .post("/login", data)
       .then((res) => {
