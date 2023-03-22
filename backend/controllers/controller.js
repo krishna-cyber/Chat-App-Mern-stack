@@ -2,6 +2,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
+const Messages = require("../models/Message");
 
 //define a function that generates a jwt token
 function generateAccessToken(username, id) {
@@ -97,8 +98,12 @@ const profile = async (req, res) => {
 };
 
 const getMessages = async (req, res) => {
-  const { sender, receiver } = req.body;
-  console.log(sender, receiver);
+  console.log(req.body.sender, req.body.receiver);
+  const messages = await Messages.find({
+    sender: req.body.sender,
+    receiver: req.body.receiver,
+  }).sort({ createdAt: -1 });
+  res.status(200).json(messages);
 };
 
 module.exports = { home, registerUser, loginUser, profile, getMessages };

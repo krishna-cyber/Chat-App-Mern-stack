@@ -19,6 +19,6 @@ router.post("/login", loginUser);
 
 router.get("/profile", profile);
 
-router.get("/messages/:userId", getMessages);
+router.get("/messages/", getMessages);
 
 module.exports = router;
