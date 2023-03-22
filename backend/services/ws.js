@@ -31,7 +31,20 @@ module.exports = (server) => {
         receiver: parsedData.to,
         message: parsedData.message,
       });
-      console.log(messageDoc);
+      //send the message to the receiver
+      [...wss.clients].forEach((client) => {
+        if (client.id === parsedData.to) {
+          client.send(
+            JSON.stringify({
+              message: {
+                sender: parsedData.from,
+                receiver: parsedData.to,
+                message: parsedData.message,
+              },
+            })
+          );
+        }
+      });
     });
 
     //inform all clients about new user when a new user connected to server

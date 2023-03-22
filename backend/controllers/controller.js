@@ -2,7 +2,6 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const localStrategy = require("passport-local").Strategy;
 
 //define a function that generates a jwt token
 function generateAccessToken(username, id) {
@@ -12,10 +11,12 @@ function generateAccessToken(username, id) {
   });
 }
 
+//simple route for hompage or server test
 const home = (req, res) => {
   res.send("Hello World!");
 };
 
+//user registration and token generation
 const registerUser = async (req, res) => {
   try {
     const { _id, username } = await User.create(req.body).catch((err) => {
@@ -40,7 +41,7 @@ const registerUser = async (req, res) => {
   }
 };
 
-//login user
+//login user and token generation
 const loginUser = async (req, res) => {
   let { username, password } = req.body;
   User.findOne({ username })
@@ -81,7 +82,7 @@ const loginUser = async (req, res) => {
     });
 };
 
-//profile
+//profile to verify the token identity
 const profile = async (req, res) => {
   const { token } = req.cookies;
   if (!token) {
@@ -95,4 +96,9 @@ const profile = async (req, res) => {
   });
 };
 
-module.exports = { home, registerUser, loginUser, profile };
+const getMessages = async (req, res) => {
+  const { sender, receiver } = req.body;
+  console.log(sender, receiver);
+};
+
+module.exports = { home, registerUser, loginUser, profile, getMessages };
