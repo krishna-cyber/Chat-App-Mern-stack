@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const passport = require("passport");
 const Messages = require("../models/Message");
 
 //define a function that generates a jwt token
@@ -98,12 +97,37 @@ const profile = async (req, res) => {
 };
 
 const getMessages = async (req, res) => {
-  console.log(req.body.sender, req.body.receiver);
+  console.log(req.body);
   const messages = await Messages.find({
-    sender: req.body.sender,
-    receiver: req.body.receiver,
-  }).sort({ createdAt: -1 });
+    sender: { $in: [req.body.sender, req.body.receiver] },
+    receiver: { $in: [req.body.sender, req.body.receiver] },
+  }).sort({ createdAt: 1 });
   res.status(200).json(messages);
 };
 
-module.exports = { home, registerUser, loginUser, profile, getMessages };
+const getusers = async (req, res) => {
+  const users = await User.find({});
+  //sending only username and id to the client
+  const newuser = users.map((user) => {
+    return {
+      username: user.username,
+      id: user._id,
+    };
+  });
+  res.status(200).json(newuser);
+};
+
+const logout = async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logged out" });
+};
+
+module.exports = {
+  home,
+  registerUser,
+  loginUser,
+  profile,
+  getMessages,
+  getusers,
+  logout,
+};

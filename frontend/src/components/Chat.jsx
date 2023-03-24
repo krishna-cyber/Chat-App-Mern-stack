@@ -145,7 +145,7 @@ const Chat = () => {
             />
           </svg>
         </div>
-        <div className=' h-[74%] flex flex-col gap-2'>
+        <div className=' h-[71%] flex flex-col gap-2'>
           {Object.keys(onlineUsers).map((key) => (
             <div
               key={key}
@@ -162,7 +162,7 @@ const Chat = () => {
           ))}
         </div>
         <div
-          className=' w-[60%] mx-auto rounded-md p-8
+          className=' w-[75%] mx-auto rounded-md p-8
          bg-blue-200 self-end flex items-center gap-3 '>
           <Avatar />
           <p className=' text-lime-800 text-lg font-semibold'>{user}</p>

@@ -6,9 +6,11 @@ import { Route, Routes } from "react-router-dom";
 import Chat from "./components/Chat";
 const Logger = () => {
   const { user, id } = useContext(userContext);
-  if (user) {
+
+  if (user && id) {
     return <Chat />;
   }
+
   return (
     <div>
       <Routes>

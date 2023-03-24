@@ -9,6 +9,8 @@ const {
   loginUser,
   profile,
   getMessages,
+  getusers,
+  logout,
 } = require("../controllers/controller");
 
 router.get("/", home);
@@ -19,6 +21,10 @@ router.post("/login", loginUser);
 
 router.get("/profile", profile);
 
-router.get("/messages/", getMessages);
+router.post("/messages/", getMessages);
+
+router.get("/users", getusers);
+
+router.get("/logout", logout);
 
 module.exports = router;
