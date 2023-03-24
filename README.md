@@ -51,8 +51,8 @@ This will start the server and client applications. The client application will 
 
 ## Screenshots
 
- <img src="./screenshots/Frontend.png">
-    <img src="./screenshots/chat.png">
+ <img src="https://raw.githubusercontent.com/krishna-cyber/Chat-App-Mern-stack/main/Screenshots/Frontend.png">
+    <img src="https://raw.githubusercontent.com/krishna-cyber/Chat-App-Mern-stack/main/Screenshots/chat.png">
 
 ## Technologies Used
 
