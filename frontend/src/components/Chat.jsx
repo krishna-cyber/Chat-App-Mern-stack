@@ -4,6 +4,7 @@ import Avatar from "./Avatar";
 import { userContext } from "../userContext";
 import server from "../../utils/server";
 import { uniqBy } from "lodash";
+import { Link } from "react-router-dom";
 
 const Chat = () => {
   const [ws, setws] = useState(null);
@@ -13,7 +14,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const divundermessages = useRef();
 
-  const { id } = useContext(userContext);
+  const { id, user, setUser, setId } = useContext(userContext);
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:3000");
@@ -27,7 +28,7 @@ const Chat = () => {
     return () => {
       socket.close();
     };
-  }, []);
+  }, [user, id]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -43,6 +44,13 @@ const Chat = () => {
         });
     }
   }, [selectedUser]);
+
+  const handlelogout = () => {
+    server.get("/logout").then((res) => {
+      setUser(null);
+      setId(null);
+    });
+  };
 
   const handlemessage = (e) => {
     //parse json to object
@@ -110,7 +118,7 @@ const Chat = () => {
 
   return (
     <section className=' h-screen flex'>
-      <div className=' w-1/3 bg-blue-100 '>
+      <div className=' w-1/3 flex flex-col bg-blue-100 '>
         <div className='flex gap-2 font-bold text-3xl text-blue-600 items-center p-4'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -137,7 +145,7 @@ const Chat = () => {
             />
           </svg>
         </div>
-        <div className=' flex flex-col gap-2'>
+        <div className=' h-[74%] flex flex-col gap-2'>
           {Object.keys(onlineUsers).map((key) => (
             <div
               key={key}
@@ -152,6 +160,20 @@ const Chat = () => {
               {onlineUsers[key]}
             </div>
           ))}
+        </div>
+        <div
+          className=' w-[60%] mx-auto rounded-md p-8
+         bg-blue-200 self-end flex items-center gap-3 '>
+          <Avatar />
+          <p className=' text-lime-800 text-lg font-semibold'>{user}</p>
+          <Link
+            to='/Login'
+            onClick={() => {
+              handlelogout();
+            }}
+            className=' text-lime-800 p-2 bg-blue-300 w-fit rounded-md ml-auto hover:bg-blue-400 hover:text-lime-400'>
+            Logout{" "}
+          </Link>
         </div>
       </div>
       <div className=' w-2/3 bg-blue-50 flex p-4 flex-col'>
