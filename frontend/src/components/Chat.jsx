@@ -23,17 +23,23 @@ const Chat = () => {
     //execute only when refresh state changes
 
     socket.addEventListener("message", handlemessage);
-  }, [refresh]);
+
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   useEffect(() => {
     if (selectedUser) {
+      console.log(selectedUser);
+      console.log(id);
       server
-        .get(`/messages`, {
+        .post(`/messages`, {
           sender: id,
           receiver: selectedUser,
         })
         .then((res) => {
-          console.log(res.data);
+          setMessages(res.data);
         });
     }
   }, [selectedUser]);
@@ -50,9 +56,9 @@ const Chat = () => {
     if (data.message) {
       //if message is for current user
       if (data.message.receiver === id) {
-        data.message.id = Date.now();
+        data.message._id = Date.now();
         //add message to messages array
-        setMessages((prev) => uniqBy([...prev, data.message], "id"));
+        setMessages((prev) => uniqBy([...prev, data.message], "_id"));
       }
     }
   };
@@ -90,7 +96,7 @@ const Chat = () => {
         message: data.message,
         receiver: selectedUser,
         sender: id,
-        id: Date.now(),
+        _id: Date.now(),
       },
     ]);
     setValue("message", "");

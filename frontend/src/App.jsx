@@ -2,6 +2,8 @@ import { useContext, useEffect } from "react";
 import Logger from "./Logger";
 import server from "../utils/server";
 import { userContext } from "./userContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const { user, setUser, id, setId } = useContext(userContext);
@@ -26,6 +28,7 @@ function App() {
   return (
     <>
       <Logger />
+      <ToastContainer />
     </>
   );
 }

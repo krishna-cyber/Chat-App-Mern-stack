@@ -4,7 +4,6 @@ import server from "../../utils/server";
 import { userContext } from "../userContext";
 
 import { Link } from "react-router-dom";
-import axios from "axios";
 
 const Register = () => {
   const {
